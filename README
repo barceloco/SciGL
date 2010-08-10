@@ -1,8 +1,7 @@
 SciGL - The Scientific visualization library based on OpenGL
 (c) 2010 by Armand Niederberger <Armand.Niederberger@opfocus.net>
 
-Version 0.0-1 beta:
-Contains basic functionality to plot a 3D graph representing a nx*ny height matrix stored in a one-dimensional (double) array.
-See test-scigl.c for details of useage.
-Compile command: gcc test-scigl.c scigl.c -framework GLUT -framework OpenGL
+Version 0.1 beta:
+Contains basic functionality to plot a 3D graph representing a nx*ny height matrix stored in a one-dimensional array.
+See scigl-viz.cpp for details of useage.
 
