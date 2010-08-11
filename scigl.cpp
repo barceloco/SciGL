@@ -6,7 +6,6 @@
 #include "scigl.h"
 
 using namespace std;
-
 #define sqr(a) (a)*(a)
 
 // Global Variables and auxiliary functions {{{
@@ -83,12 +82,14 @@ float** scigl_heightmapphasemovie;
 float** scigl_heightmapnorm2movie;
 
 void scigl_InitDefaultVariables(int maxx, int maxy);
+void scigl_DefaultViewingParameters(void);
 void scigl_ImportMap(float* inputarray);
 void scigl_loadheightmap(int mapid);
 void scigl_nextframe(void);
+void scigl_ShowHelp(void);
 void scigl_startGLUT(void);
 void scigl_DisplayFunc(void);
-void scigl_KeyboardFunc(unsigned char key, int ScreenPosX, int ScreenPosY)
+void scigl_KeyboardFunc(unsigned char key, int ScreenPosX, int ScreenPosY);
 void scigl_SpecialFunc(int key, int ScreenPosX, int ScreenPosY);
 void scigl_MouseFunc(int button, int state, int ScreenPosX, int ScreenPosY);
 void scigl_MotionFunc(int ScreenPosX, int ScreenPosY);
@@ -126,7 +127,7 @@ void tbc_drawAxis(void);
 	WindowWidth=1200;
 	WindowHeight=800;
 	WindowTitle = new char[100];
-	strcpy(WindowTitle, "libSciGL - version 0.1beta");
+	strcpy(WindowTitle, "libSciGL - version 0.1 beta");
 	scigl_WindowTimer			= 25;
 	scigl_zoomfactor			= 1.0;
 	scigl_scaleX				= 1.0;
@@ -206,7 +207,7 @@ void heightmap::state(void)
 	cout << "scigl_dynAngleHorizontal = " << scigl_dynAngleHorizontal << endl;
 	cout << "scigl_dynAngleVertical   = " << scigl_dynAngleVertical << endl;
 }
-void heightmap::showhelp(void) {
+void scigl_showhelp(void) {
 	cout << "SciGL - The Scientific visualization library based on OpenGL, Version 0.1 beta" << endl;
 	cout << "(c) 2010 by Armand Niederberger <Armand.Niederberger@opfocus.net>" << endl << endl;
 	cout << "Command keys in graphic mode" << endl;
@@ -274,6 +275,7 @@ void plot(int maxx, int maxy, float *inputarray) {{{
 	scigl_IsComplex = 0;
 	scigl_InitDefaultVariables(maxx, maxy);
 	scigl_ImportMap(inputarray);
+	scigl_ShowHelp();
 	scigl_startGLUT();
 } }}}
 void plotcomplex(int maxx, int maxy, float *inputarray) {{{
@@ -282,6 +284,7 @@ void plotcomplex(int maxx, int maxy, float *inputarray) {{{
 	scigl_IsComplex = 1;
 	scigl_InitDefaultVariables(maxx, maxy);
 	scigl_ImportMap(inputarray);
+	scigl_ShowHelp();
 	scigl_startGLUT();
 } }}}
 void plotmovie(int NbrOfFrames, int maxx, int maxy, float *inputarray) {{{
@@ -291,6 +294,7 @@ void plotmovie(int NbrOfFrames, int maxx, int maxy, float *inputarray) {{{
 	scigl_InitDefaultVariables(maxx, maxy);
 	scigl_NbrOfFrames	= NbrOfFrames;
 	scigl_ImportMap(inputarray);
+	scigl_ShowHelp();
 	scigl_startGLUT();
 } }}}
 void plotcomplexmovie(int NbrOfFrames, int maxx, int maxy, float *inputarray) {{{
@@ -300,6 +304,7 @@ void plotcomplexmovie(int NbrOfFrames, int maxx, int maxy, float *inputarray) {{
 	scigl_InitDefaultVariables(maxx, maxy);
 	scigl_NbrOfFrames	= NbrOfFrames;
 	scigl_ImportMap(inputarray);
+	scigl_ShowHelp();
 	scigl_startGLUT();
 } }}}
 void plot(int maxx, int maxy, double *inputarray) {{{
@@ -312,6 +317,7 @@ void plot(int maxx, int maxy, double *inputarray) {{{
 	for (int i=0; i<maxx*maxy; i++) floatinputarray[i] = (float) inputarray[i];
 	scigl_ImportMap(floatinputarray);
 	delete floatinputarray;
+	scigl_ShowHelp();
 	scigl_startGLUT();
 } }}}
 void plotcomplex(int maxx, int maxy, double *inputarray) {{{
@@ -324,6 +330,7 @@ void plotcomplex(int maxx, int maxy, double *inputarray) {{{
 	for (int i=0; i<2*maxx*maxy; i++) floatinputarray[i] = (float) inputarray[i];
 	scigl_ImportMap(floatinputarray);
 	delete floatinputarray;
+	scigl_ShowHelp();
 	scigl_startGLUT();
 } }}}
 void plotmovie(int NbrOfFrames, int maxx, int maxy, double *inputarray) {{{
@@ -337,6 +344,7 @@ void plotmovie(int NbrOfFrames, int maxx, int maxy, double *inputarray) {{{
 	for (int i=0; i<NbrOfFrames*maxx*maxy; i++) floatinputarray[i] = (float) inputarray[i];
 	scigl_ImportMap(floatinputarray);
 	delete floatinputarray;
+	scigl_ShowHelp();
 	scigl_startGLUT();
 } }}}
 void plotcomplexmovie(int NbrOfFrames, int maxx, int maxy, double *inputarray) {{{
@@ -350,6 +358,7 @@ void plotcomplexmovie(int NbrOfFrames, int maxx, int maxy, double *inputarray) {
 	for (int i=0; i<2*NbrOfFrames*maxx*maxy; i++) floatinputarray[i] = (float) inputarray[i];
 	scigl_ImportMap(floatinputarray);
 	delete floatinputarray;
+	scigl_ShowHelp();
 	scigl_startGLUT();
 } }}}
 void plotcomplexfloatmovie(char* filename) {{{
@@ -415,12 +424,19 @@ void scigl_InitDefaultVariables(int maxx, int maxy) {{{
 
 	scigl_WindowWidth			= 1200;
 	scigl_WindowHeight			= 800;
-	//scigl_WindowTimer			= 25;
-	scigl_WindowTimer			= 100;
+	scigl_WindowTimer			= 25;
+	//scigl_WindowTimer			= 100;
 	
 	scigl_WindowTitle 			= new char[100];
-	strcpy(scigl_WindowTitle, "libSciGL - Version 0.1-beta");
+	strcpy(scigl_WindowTitle, "libSciGL - Version 0.1 beta");
 	
+	scigl_PlayMovie				= 0;
+	scigl_NbrOfFrames			= 0;
+	
+	scigl_DefaultViewingParameters();
+} }}}	
+void scigl_DefaultViewingParameters(void) {{{
+{
 	scigl_zoomfactor			= 100.0;
 	scigl_scaleX				= 0.02;
 	scigl_scaleY				= 0.02;
@@ -428,15 +444,13 @@ void scigl_InitDefaultVariables(int maxx, int maxy) {{{
 	scigl_translateX			= 2.5;
 	scigl_translateY			= 0.0;
 	scigl_translateZ			= 0.0;
-	scigl_angleHorizontal		= 60.0;
+	scigl_angleHorizontal		= -10.0;
 	scigl_angleVertical 		= 30.0;
 	scigl_RotationCenterX		= scigl_NbrOfPointsX/2.0f;
 	scigl_RotationCenterY		= scigl_NbrOfPointsY/2.0f;
 	scigl_RotationCenterZ		= 0.0f;;
 	scigl_ColorPrefix			= 3.1415/2.0;
-	scigl_PlayMovie				= 0;
 	scigl_CurrentFrame			= 0;
-	scigl_NbrOfFrames			= 0;
 	scigl_ShowWireframe			= 0;
 	scigl_ShowAxis				= 1;
 	scigl_NormalizeZscaling		= 0;
@@ -621,10 +635,54 @@ void scigl_ImportMap(float* inputarray) {{{
 		}
 	}
 } }}}
+void scigl_ShowHelp(void) {{{
+{
+	cout << "SciGL - The scientific visualization library based on OpenGL, Version 0.1 beta" << endl;
+	cout << "(c) 2010 by Armand Niederberger <Armand.Niederberger@opfocus.org>" << endl << endl;
+	cout << "Command keys in graphic mode" << endl;
+	cout << "A          toggle axis on/off" << endl;
+	cout << "W          toggle Wireframe on/off. Default: off" << endl;
+	cout << "N          toggle Normalized heights on/off. Default: off" << endl;
+	cout << "R          restore default viewing parameters" << endl;
+	cout << "+          zoom in " << endl;
+	cout << "-          zoom out" << endl;
+	cout << "up         rotate up" << endl;
+	cout << "down       rotate down" << endl;
+	cout << "left       rotate left" << endl;
+	cout << "right      rotate right" << endl;
+	cout << "page-up    move up" << endl;
+	cout << "page-down  move down" << endl;
+	cout << "home       move left" << endl;
+	cout << "end        move right" << endl;
+	cout << "X          inflate x axis" << endl;
+	cout << "x          deflate x axis" << endl;
+	cout << "Y          inflate y axis" << endl;
+	cout << "y          deflate y axis" << endl;
+	cout << "Z          inflate z axis" << endl;
+	cout << "z          deflate z axis" << endl;
+	
+	if (scigl_IsComplex)
+	{
+		cout << "1          Plot real-part" << endl;
+		cout << "2          Plot imaginary-part" << endl;
+		cout << "3          Plot norm" << endl;
+		cout << "4          Plot complex phase" << endl;
+		cout << "5          Plot intensity (i.e. the square of thenorm)" << endl;
+	}
+	if (scigl_IsMovie)
+	{
+	cout << "(space)    Play/Pause movie" << endl;
+		cout << ">          Show next movie frame" << endl;
+		cout << "<          Show former movie frame" << endl;
+	}
+
+	cout << "ESC        Quit" << endl;
+} }}}
 void scigl_loadheightmap(int mapid) {{{
 {
 	if (scigl_IsComplex)
 	{
+		if (scigl_NormalizeZscaling) scigl_scaleZ *= (scigl_Zmax-scigl_Zmin)/100.0f;
 		if (scigl_IsMovie)
 		{
 			switch (mapid)
@@ -675,6 +733,7 @@ void scigl_loadheightmap(int mapid) {{{
 						break;
 			}
 		}
+		if (scigl_NormalizeZscaling) scigl_scaleZ *= 100.0f/(scigl_Zmax-scigl_Zmin);
 	}
 } }}}
 void scigl_nextframe(void) {{{
@@ -705,10 +764,12 @@ void scigl_startGLUT(void) {{{
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);
 	GLfloat lightColor0[] = {0.5f, 0.5f, 0.5f, 1.0f};
 	GLfloat lightPos0[] = {0.6f, 1.0f, .5, 0.0f};
+	//GLfloat lightPos0[] = {0.5f, 0.6f, 1.0f, 0.0f};
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor0);
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPos0);
 	GLfloat lightColor1[] = {0.4f, 0.4f, 0.4f, 1.0f};
 	GLfloat lightPos1[] = {1.0f, 0.3f, .5, 0.0f};
+	//GLfloat lightPos1[] = {0.5f, 1.0f, 0.3f, 0.0f};
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightColor1);
 	glLightfv(GL_LIGHT1, GL_POSITION, lightPos1);
 	
@@ -766,8 +827,8 @@ void scigl_DisplayFunc(void) {{{
 		for(int y = 0; y < scigl_NbrOfPointsY; y++)
 		{
 			glColor3f(0.5, 0.6, 1.0);
-			h=(sin(scigl_ColorPrefix/(scigl_Zmax-scigl_Zmin)*(scigl_heightmap[x*scigl_NbrOfPointsY+y]-scigl_Zmin)));
-			hp=(sin(scigl_ColorPrefix/(scigl_Zmax-scigl_Zmin)*(scigl_heightmap[(x+1)*scigl_NbrOfPointsY+y]-scigl_Zmin)));
+			h=0.8*(sin(scigl_ColorPrefix/(scigl_Zmax-scigl_Zmin)*(scigl_heightmap[x*scigl_NbrOfPointsY+y]-scigl_Zmin)));
+			hp=0.8*(sin(scigl_ColorPrefix/(scigl_Zmax-scigl_Zmin)*(scigl_heightmap[(x+1)*scigl_NbrOfPointsY+y]-scigl_Zmin)));
 			float NormalZ1 = 0.0f;
 			float NormalZ2 = 0.0f;
 			float NormalZ3 = 0.0f;
@@ -784,9 +845,25 @@ void scigl_DisplayFunc(void) {{{
 			float NormalY=(NormalZ3 - NormalZ1) / 2.0f;
 			float NormalZ=1.0f;
 			glNormal3f(NormalX, NormalY, NormalZ);
-			glColor3f(h+0.1, h+0.1, sqrt(h)+0.1);
+			glColor3f(h+0.2, h+0.2, sqrt(h)+0.2);
 			glVertex3f(x, y, scigl_heightmap[x*scigl_NbrOfPointsY+y]);
-			glColor3f(hp+0.1, hp+0.1, sqrt(hp)+0.1);
+			NormalZ1 = 0.0f;
+			NormalZ2 = 0.0f;
+			NormalZ3 = 0.0f;
+			NormalZ4 = 0.0f;
+			if (y+1<scigl_NbrOfPointsY)
+				NormalZ1 = scigl_heightmap[(x+1)*scigl_NbrOfPointsY + (y+1)];
+			if (x+2<scigl_NbrOfPointsX)
+				NormalZ2 = scigl_heightmap[(x+2)*scigl_NbrOfPointsY + (y+0)];
+			if (y>0)
+				NormalZ3 = scigl_heightmap[(x+1)*scigl_NbrOfPointsY + (y-1)];
+			if (x+1>0)
+				NormalZ4 = scigl_heightmap[(x+0)*scigl_NbrOfPointsY + (y+0)];
+			NormalX=(NormalZ4 - NormalZ2) / 2.0f;
+			NormalY=(NormalZ3 - NormalZ1) / 2.0f;
+			NormalZ=1.0f;
+			glNormal3f(NormalX, NormalY, NormalZ);
+			glColor3f(hp+0.2, hp+0.2, sqrt(hp)+0.2);
 			glVertex3f(x+1, y, scigl_heightmap[(x+1)*scigl_NbrOfPointsY+y]);
 		}
 		glEnd();
@@ -798,7 +875,7 @@ void scigl_DisplayFunc(void) {{{
 	{
 		// Draw red X-Axis
 		glPushMatrix();
-		glRotatef(90, 1.0f, 0.0f, 0.0f);
+		glRotatef(90, 0.0f, 1.0f, 0.0f);
 		glColor3f(1.0f,0.0f,0.0f);
 		GLUquadricObj* xaxe;
 		xaxe = gluNewQuadric();
@@ -811,7 +888,7 @@ void scigl_DisplayFunc(void) {{{
 
 		// Draw green Y-Axis
 		glPushMatrix();
-		glRotatef(90, 0.0f, 1.0f, 0.0f);
+		glRotatef(-90, 1.0f, 0.0f, 0.0f);
 		glColor3f(0.0f,1.0f,0.0f);
 		GLUquadricObj* yaxe;
 		yaxe = gluNewQuadric();
@@ -845,16 +922,18 @@ void scigl_KeyboardFunc(unsigned char key, int ScreenPosX, int ScreenPosY) {{{
 		case '4':	scigl_loadheightmap(4); break;
 		case '5':	scigl_loadheightmap(5); break;
 		case 'A':	scigl_ShowAxis			 = 1-scigl_ShowAxis; break;
-		case 'P':	scigl_PlayMovie			 = 1-scigl_PlayMovie; break;
+		case ' ':	scigl_PlayMovie			 = 1-scigl_PlayMovie; break;
+		case '>':	scigl_CurrentFrame = (scigl_CurrentFrame+1)%scigl_NbrOfFrames; break;
+		case '<':	scigl_CurrentFrame = (scigl_CurrentFrame+scigl_NbrOfFrames-1)%scigl_NbrOfFrames; break;
+		case 'R':	scigl_DefaultViewingParameters(); break;
 		case 'W':	scigl_ShowWireframe		 = 1-scigl_ShowWireframe; break;
-		case ' ':	scigl_CurrentFrame = (scigl_CurrentFrame+1)%scigl_NbrOfFrames; break;
 		case 'N':	scigl_NormalizeZscaling	 = 1-scigl_NormalizeZscaling;
 					if (scigl_Zmax-scigl_Zmin > 0.0)
 					{
 						if (scigl_NormalizeZscaling) 
-							scigl_scaleZ *= 150.0f/(scigl_Zmax-scigl_Zmin);
+							scigl_scaleZ *= 100.0f/(scigl_Zmax-scigl_Zmin);
 						else 
-							scigl_scaleZ *= (scigl_Zmax-scigl_Zmin)/150.0f;
+							scigl_scaleZ *= (scigl_Zmax-scigl_Zmin)/100.0f;
 					}
 					break;
 		case 'X':	scigl_dynScaleX			+=  10; break;
@@ -865,8 +944,6 @@ void scigl_KeyboardFunc(unsigned char key, int ScreenPosX, int ScreenPosY) {{{
 		case 'z':	scigl_dynScaleZ			+= -10; break;
 		case '+':	scigl_dynZoomfactor		+=  10; break;
 		case '-':	scigl_dynZoomfactor		+= -10; break;
-		case '>':	scigl_dynColorPrefix	+=  10; break;
-		case '<':	scigl_dynColorPrefix	+= -10; break;
 		case  27:	cout << "Quitting." << endl; exit(0);
 	}
 	glutPostRedisplay();
@@ -927,63 +1004,93 @@ void scigl_TimerFunc(int value) {{{
 	scigl_nextframe();
 	if (scigl_dynAngleHorizontal>0)
 	{
-		scigl_angleHorizontal		+= 5.0;
+		scigl_angleHorizontal		+= 1.0;
 		scigl_dynAngleHorizontal	-= 1;
 	}
 	if (scigl_dynAngleHorizontal<0)
 	{
-		scigl_angleHorizontal		-= 5.0;
+		scigl_angleHorizontal		-= 1.0;
 		scigl_dynAngleHorizontal	+= 1;
 	}
 	if (scigl_dynAngleVertical>0)
 	{
-		scigl_angleVertical		+= 5.0;
+		scigl_angleVertical		+= 1.0;
 		scigl_dynAngleVertical	-= 1;
 	}
 	if (scigl_dynAngleVertical<0)
 	{
-		scigl_angleVertical		-= 5.0;
+		scigl_angleVertical		-= 1.0;
 		scigl_dynAngleVertical	+= 1;
 	}
 	if (scigl_dynTranslateX>0)
 	{
-		scigl_translateX	+= 0.1;
+		scigl_translateX	+= 0.05;
 		scigl_dynTranslateX	-= 1;
 	}
 	if (scigl_dynTranslateX<0)
 	{
-		scigl_translateX	-= 0.1;
+		scigl_translateX	-= 0.05;
 		scigl_dynTranslateX	+= 1;
 	}
 	if (scigl_dynTranslateY>0)
 	{
-		scigl_translateY	+= 0.1;
+		scigl_translateY	+= 0.05;
 		scigl_dynTranslateY	-= 1;
 	}
 	if (scigl_dynTranslateY<0)
 	{
-		scigl_translateY	-= 0.1;
+		scigl_translateY	-= 0.05;
 		scigl_dynTranslateY	+= 1;
 	}
 	if (scigl_dynTranslateZ>0)
 	{
-		scigl_translateZ	+= 0.1;
+		scigl_translateZ	+= 0.05;
 		scigl_dynTranslateZ	-= 1;
 	}
 	if (scigl_dynTranslateZ<0)
 	{
-		scigl_translateZ	-= 0.1;
+		scigl_translateZ	-= 0.05;
 		scigl_dynTranslateZ	+= 1;
 	}
 	if (scigl_dynZoomfactor > 0)
 	{
-		scigl_zoomfactor	*= 1.05;
+		scigl_zoomfactor	*= 1.02;
 		scigl_dynZoomfactor	-= 1;
 	}
 	if (scigl_dynZoomfactor < 0)
 	{
-		scigl_zoomfactor	/= 1.05;
+		scigl_zoomfactor	/= 1.02;
 		scigl_dynZoomfactor	+= 1;
+	}
+	if (scigl_dynScaleX > 0)
+	{
+		scigl_scaleX		*= 1.02;
+		scigl_dynScaleX		-= 1;
+	}
+	if (scigl_dynScaleX < 0)
+	{
+		scigl_scaleX		/= 1.02;
+		scigl_dynScaleX		+= 1;
+	}
+	if (scigl_dynScaleY > 0)
+	{
+		scigl_scaleY		*= 1.02;
+		scigl_dynScaleY		-= 1;
+	}
+	if (scigl_dynScaleY < 0)
+	{
+		scigl_scaleY		/= 1.02;
+		scigl_dynScaleY		+= 1;
+	}
+	if (scigl_dynScaleZ > 0)
+	{
+		scigl_scaleZ		*= 1.02;
+		scigl_dynScaleZ		-= 1;
+	}
+	if (scigl_dynScaleZ < 0)
+	{
+		scigl_scaleZ		/= 1.02;
+		scigl_dynScaleZ		+= 1;
 	}
 
 	if (scigl_angleHorizontal>360.f)	scigl_angleHorizontal = scigl_angleHorizontal - 360.f;

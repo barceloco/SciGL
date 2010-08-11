@@ -10,7 +10,8 @@ using namespace std;
 //#include "imglib.h"
 int main(int argc, char** argv) {
 //	heightmap* hm;
-	int ChooseFigure=4;
+	//int ChooseFigure=4;
+	int ChooseFigure=2;
 	
 	int height;
 	int width;
